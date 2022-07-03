@@ -4,7 +4,7 @@ const { ErrCodeBadData, ErrCodeNotFound, ErrCodeServer } = require('../costants/
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => res.status(500).send({ message: 'Ошибка на сервере' }));
+    .catch(() => res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' }));
 };
 
 module.exports.createCard = (req, res) => {
