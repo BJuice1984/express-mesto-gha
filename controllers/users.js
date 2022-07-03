@@ -1,9 +1,10 @@
 const User = require('../models/user');
+const { ErrCodeBadData, ErrCodeNotFound, ErrCodeServer } = require('../costants/constants');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500).send({ message: `Ошибка на сервере: ${err.message}` }));
+    .catch(() => res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' }));
 };
 
 module.exports.getUserId = (req, res) => {
@@ -11,16 +12,16 @@ module.exports.getUserId = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Ошибка. Данные не корректны' });
+        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Данные не корректны' });
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: `Ошибка. Пользователь не найден: ${err.message}` });
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Пользователь не найден' });
       } else {
-        res.status(500).send({ message: `Ошибка на сервере: ${err.message}` });
+        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
       }
     });
 };
@@ -31,9 +32,9 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка. Данные не корректны: ${err.message}` });
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
       } else {
-        res.status(500).send({ message: `Ошибка на сервере: ${err.message}` });
+        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
       }
     });
 };
@@ -46,16 +47,16 @@ module.exports.updateUser = (req, res) => {
   })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Ошибка. Пользователь не найден' });
+        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Пользователь не найден' });
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка. Данные не корректны: ${err.message}` });
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
       } else {
-        res.status(500).send({ message: `Ошибка на сервере: ${err.message}` });
+        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
       }
     });
 };
@@ -68,16 +69,16 @@ module.exports.updateUserAvatar = (req, res) => {
   })
     .then((ava) => {
       if (!ava) {
-        res.status(404).send({ message: 'Ошибка. Пользователь не найден' });
+        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Пользователь не найден' });
       } else {
         res.send(ava);
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка. Данные не корректны: ${err.message}` });
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
       } else {
-        res.status(500).send({ message: `Ошибка на сервере: ${err.message}` });
+        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
       }
     });
 };

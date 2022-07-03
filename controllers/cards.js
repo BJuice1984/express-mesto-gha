@@ -1,9 +1,10 @@
 const Card = require('../models/card');
+const { ErrCodeBadData, ErrCodeNotFound, ErrCodeServer } = require('../costants/constants');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send(err.message));
+    .catch(() => res.status(500).send({ message: 'Ошибка на сервере' }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -12,9 +13,9 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка. Данные не корректны: ${err.message}` });
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
       } else {
-        res.status(500).send({ message: `Ошибка на сервере: ${err.message}` });
+        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
       }
     });
 };
@@ -23,16 +24,16 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Ошибка. Карточка не найдена' });
+        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Карточка не найдена' });
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: `Ошибка. Данные не корректны: ${err.message}` });
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
       } else {
-        res.status(500).send({ message: `Ошибка на сервере: ${err.message}` });
+        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
       }
     });
 };
@@ -45,16 +46,16 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Ошибка. Карточка не найдена' });
+        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Карточка не найдена' });
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: `Ошибка. Данные не корректны: ${err.message}` });
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
       } else {
-        res.status(500).send({ message: `Ошибка на сервере: ${err.message}` });
+        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
       }
     });
 };
@@ -67,16 +68,16 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Ошибка. Карточка не найдена' });
+        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Карточка не найдена' });
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: `Ошибка. Данные не корректны: ${err.message}` });
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
       } else {
-        res.status(500).send({ message: `Ошибка на сервере: ${err.message}` });
+        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
       }
     });
 };

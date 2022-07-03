@@ -5,6 +5,7 @@ const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
+const { ErrCodeNotFound } = require('./costants/constants');
 
 const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -19,7 +20,7 @@ app.use((req, res, next) => {
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use((req, res) => res.status(404).send({ message: 'Ой, кажется, такой страницы не существует.. Ошибка!' }));
+app.use((req, res) => res.status(ErrCodeNotFound).send({ message: 'Ой, кажется, такой страницы не существует.. Ошибка!' }));
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
