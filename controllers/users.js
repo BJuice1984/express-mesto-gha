@@ -1,5 +1,6 @@
 const User = require('../models/user');
-const { ErrCodeBadData, ErrCodeNotFound, ErrCodeServer } = require('../costants/constants');
+const { ErrCodeBadData, ErrCodeServer } = require('../costants/constants');
+const NotFoundError = require('../errors/not-found-err');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -10,13 +11,8 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserId = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Данные не корректны' });
-      } else {
-        res.send(user);
-      }
-    })
+    .orFail(() => { throw new NotFoundError('Ошибка. Данные не корректны'); })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Пользователь не найден' });
@@ -27,8 +23,8 @@ module.exports.getUserId = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const { name, about, avatar, email, password } = req.body;
+  User.create({ name, about, avatar, email, password })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -45,13 +41,8 @@ module.exports.updateUser = (req, res) => {
     new: true,
     runValidators: true,
   })
-    .then((user) => {
-      if (!user) {
-        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Пользователь не найден' });
-      } else {
-        res.send(user);
-      }
-    })
+    .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
@@ -67,13 +58,8 @@ module.exports.updateUserAvatar = (req, res) => {
     new: true,
     runValidators: true,
   })
-    .then((ava) => {
-      if (!ava) {
-        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Пользователь не найден' });
-      } else {
-        res.send(ava);
-      }
-    })
+    .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
+    .then((ava) => res.send(ava))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });

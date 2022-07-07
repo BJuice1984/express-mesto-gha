@@ -1,5 +1,6 @@
 const Card = require('../models/card');
-const { ErrCodeBadData, ErrCodeNotFound, ErrCodeServer } = require('../costants/constants');
+const { ErrCodeBadData, ErrCodeServer } = require('../costants/constants');
+const NotFoundError = require('../errors/not-found-err');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -22,13 +23,8 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Карточка не найдена' });
-      } else {
-        res.send(card);
-      }
-    })
+    .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
@@ -44,13 +40,8 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => {
-      if (!card) {
-        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Карточка не найдена' });
-      } else {
-        res.send(card);
-      }
-    })
+    .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
@@ -66,13 +57,8 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => {
-      if (!card) {
-        res.status(ErrCodeNotFound).send({ message: 'Ошибка. Карточка не найдена' });
-      } else {
-        res.send(card);
-      }
-    })
+    .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
