@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { ErrCodeBadData, ErrCodeServer } = require('../costants/constants');
 const NotFoundError = require('../errors/not-found-err');
@@ -23,8 +25,17 @@ module.exports.getUserId = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
-  User.create({ name, about, avatar, email, password })
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash, // записываем хеш в базу
+    }))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -62,6 +73,26 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
+        return;
+      }
+      next(err);
+    });
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'secret__token', { expiresIn: '7d' });
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 7 * 24,
+        httpOnly: true,
+      })
+        .send({ token });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
         return;
       }

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 const { ErrCodeNotFound } = require('./costants/constants');
@@ -20,6 +21,8 @@ app.use((req, res, next) => {
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use((req, res) => res.status(ErrCodeNotFound).send({ message: 'Ой, кажется, такой страницы не существует.. Ошибка!' }));
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {

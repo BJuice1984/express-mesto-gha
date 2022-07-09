@@ -26,7 +26,8 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
     .then((card) => {
       console.log(card);
-      res.send(card)})
+      res.send(card);
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
