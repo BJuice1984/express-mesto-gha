@@ -10,6 +10,20 @@ module.exports.getUsers = (req, res) => {
     .catch(() => res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' }));
 };
 
+module.exports.getMyProfile = (req, res, next) => {
+  const { me } = req.user._id;
+  User.findOne(me)
+    .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
+        return;
+      }
+      next(err);
+    });
+};
+
 module.exports.getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)

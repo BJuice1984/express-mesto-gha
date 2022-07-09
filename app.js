@@ -1,9 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 const { ErrCodeNotFound } = require('./costants/constants');
@@ -14,15 +17,12 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-  req.user = { _id: '62bcc099c7cc326a53a6e343' }; // вставьте сюда _id созданного в предыдущем пункте пользователя
-  next();
-});
 
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('/users', auth, usersRouter);
+app.use('/cards', auth, cardsRouter);
 app.post('/signin', login);
 app.post('/signup', createUser);
+app.use(errors());
 app.use((req, res) => res.status(ErrCodeNotFound).send({ message: 'Ой, кажется, такой страницы не существует.. Ошибка!' }));
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
