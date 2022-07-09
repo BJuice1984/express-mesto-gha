@@ -21,20 +21,22 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndDelete(req.params.cardId)
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
-    .then((card) => res.send(card))
+    .then((card) => {
+      console.log(card);
+      res.send(card)})
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-      } else {
-        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
+        return;
       }
+      next(err);
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -45,13 +47,13 @@ module.exports.likeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-      } else {
-        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
+        return;
       }
+      next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -62,8 +64,8 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-      } else {
-        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
+        return;
       }
+      next(err);
     });
 };

@@ -8,34 +8,34 @@ module.exports.getUsers = (req, res) => {
     .catch(() => res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' }));
 };
 
-module.exports.getUserId = (req, res) => {
+module.exports.getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(() => { throw new NotFoundError('Ошибка. Данные не корректны'); })
+    .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Пользователь не найден' });
-      } else {
-        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
+        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
+        return;
       }
+      next(err);
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
   User.create({ name, about, avatar, email, password })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-      } else {
-        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
+        return;
       }
+      next(err);
     });
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, {
     new: true,
@@ -46,25 +46,25 @@ module.exports.updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-      } else {
-        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
+        return;
       }
+      next(err);
     });
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
     runValidators: true,
   })
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
-    .then((ava) => res.send(ava))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-      } else {
-        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
+        return;
       }
+      next(err);
     });
 };
