@@ -1,6 +1,11 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const validator = require('validator');
+// const validator = require('validator');
+// const linkRegex = require('../costants/constants');
+
+// function validator(val) {
+//   return linkRegex.test(val);
+// }
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -11,17 +16,18 @@ const userSchema = new mongoose.Schema({
   },
   about: {
     type: String,
-    default: 'Исследователь',
+    default: 'Исследователь океанов',
     minlength: [2, 'Длина не менее 2-х симоволов, сейчас {VALUE}'],
     maxlength: [30, 'Длина не более 30-ти символов, сейчас {VALUE}'],
   },
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-    validate: {
-      validator: (v) => validator.isUrl(v),
-      message: 'Ошибка! Ссылка имеет неправильный формат',
-    },
+    // validate: {
+    //   validator: function(v) {
+    //     return linkRegex.test(v);
+    //   }
+    // },
   },
   email: {
     type: String,

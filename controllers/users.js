@@ -1,13 +1,14 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { ErrCodeBadData, ErrCodeServer } = require('../costants/constants');
+const { ErrCodeBadData, OkCodeCreated, ErrCodeConflictEmail } = require('../costants/constants');
 const NotFoundError = require('../errors/not-found-err');
+// const ConflictEmailError = require('../errors/coflict-err');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' }));
+    .catch(next);
 };
 
 module.exports.getMyProfile = (req, res, next) => {
@@ -48,16 +49,26 @@ module.exports.createUser = (req, res, next) => {
       about,
       avatar,
       email,
-      password: hash, // записываем хеш в базу
-    }))
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
-      }
-      next(err);
-    });
+      password: hash,
+    })
+      .then((user) => res.status(OkCodeCreated).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
+          return;
+        }
+        if (err.code === 11000) {
+          res.status(ErrCodeConflictEmail).send({ message: 'Ошибка. Пользователь с таким email уже зарегистрирован' });
+          return;
+        }
+        next(err);
+      }));
 };
 
 module.exports.updateUser = (req, res, next) => {
