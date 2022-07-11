@@ -1,11 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { celebrate, Joi } = require('celebrate');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { linkRegex } = require('./costants/constants');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -20,8 +22,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/users', auth, usersRouter);
 app.use('/cards', auth, cardsRouter);
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+    avatar: Joi.string()
+      .regex(linkRegex),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), createUser);
 app.use((req, res) => res.status(ErrCodeNotFound).send({ message: 'Ой, кажется, такой страницы не существует.. Ошибка!' }));
 app.use(errors());
 // eslint-disable-next-line no-unused-vars

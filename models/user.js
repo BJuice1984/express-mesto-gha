@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-// const validator = require('validator');
+const validator = require('validator');
 // const linkRegex = require('../costants/constants');
 
 // function validator(val) {
@@ -23,11 +23,10 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-    // validate: {
-    //   validator: function(v) {
-    //     return linkRegex.test(v);
-    //   }
-    // },
+    validate: {
+      validator: (v) => validator.isURL(v),
+      message: () => 'Неверный формат ссылки на изображение',
+    },
   },
   email: {
     type: String,
