@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const bodyParser = require('body-parser');
@@ -19,6 +20,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use('/users', auth, usersRouter);
 app.use('/cards', auth, cardsRouter);

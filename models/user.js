@@ -1,11 +1,6 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const validator = require('validator');
-// const linkRegex = require('../costants/constants');
-
-// function validator(val) {
-//   return linkRegex.test(val);
-// }
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -32,6 +27,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    validate: {
+      validator: (v) => validator.isEmail(v),
+      message: () => 'Неверный формат ссылки на изображение',
+    },
   },
   password: {
     type: String,
