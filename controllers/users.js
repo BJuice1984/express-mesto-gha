@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { ErrCodeBadData, OkCodeCreated, ErrCodeConflictEmail } = require('../costants/constants');
 const NotFoundError = require('../errors/not-found-err');
+const UnauthorizationError = require('../errors/unauth-err');
 // const ConflictEmailError = require('../errors/coflict-err');
 
 module.exports.getUsers = (req, res, next) => {
@@ -12,8 +13,8 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getMyProfile = (req, res, next) => {
-  const { me } = req.user._id;
-  User.findOne(me)
+  const { userId } = req.params;
+  User.findById(userId)
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
     .catch((err) => {
@@ -117,11 +118,7 @@ module.exports.login = (req, res, next) => {
       })
         .send({ token });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
-      }
-      next(err);
+    .catch(() => {
+      next(new UnauthorizationError('Ошибка. Неправильные почта или пароль'));
     });
 };
