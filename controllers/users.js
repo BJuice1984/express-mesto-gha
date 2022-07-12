@@ -124,10 +124,9 @@ module.exports.login = (req, res, next) => {
     throw error;
   }
 
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = generateToken({ _id: user._id });
-      console.log('gener');
+  return User.findUserByCredentials(email, password)
+    .then((user) => { return generateToken({ _id: user._id });})
+    .then((token) => {
       res.cookie('jwt', token, {
         maxAge: 3600000 * 7 * 24,
         httpOnly: true,
@@ -135,6 +134,10 @@ module.exports.login = (req, res, next) => {
       })
         .send({ token });
     })
+    // .then((token) => {
+    //   console.log('token', token);
+    //   res.send({ token });
+    // })
     .catch(() => {
       next(new UnauthorizationError('Ошибка. Неправильные почта или пароль'));
     });
