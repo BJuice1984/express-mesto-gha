@@ -15,8 +15,8 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getMyProfile = (req, res, next) => {
-  console.log(req.user._id);
-  const { userId } = req.user.payload;
+  console.log('me', req.user._id);
+  const { userId } = req.user._id;
   User.findById(userId)
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
@@ -30,6 +30,7 @@ module.exports.getMyProfile = (req, res, next) => {
 };
 
 module.exports.getUserId = (req, res, next) => {
+  console.log('id', req.params.userId);
   const { userId } = req.params.userId;
   User.findById(userId)
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
@@ -116,8 +117,6 @@ module.exports.updateUserAvatar = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  console.log(email);
-
   if (!email || !password) {
     const error = new Error('Ошибка. Данные не переданы');
     error.statusCode = ErrCodeBadData;
@@ -125,7 +124,7 @@ module.exports.login = (req, res, next) => {
   }
 
   return User.findUserByCredentials(email, password)
-    .then((user) => { return generateToken({ _id: user._id });})
+    .then((user) => generateToken({ _id: user._id }))
     .then((token) => {
       res.cookie('jwt', token, {
         maxAge: 3600000 * 7 * 24,
@@ -134,10 +133,6 @@ module.exports.login = (req, res, next) => {
       })
         .send({ token });
     })
-    // .then((token) => {
-    //   console.log('token', token);
-    //   res.send({ token });
-    // })
     .catch(() => {
       next(new UnauthorizationError('Ошибка. Неправильные почта или пароль'));
     });
