@@ -14,7 +14,8 @@ module.exports.createCard = (req, res, next) => {
   Card.create({ name, link, owener })
     .then((card) => res.status(OkCodeCreated).send({
       name: card.name,
-      link: card.about,
+      link: card.link,
+      owener: card.owener,
       _id: card._id,
     }))
     .catch((err) => {
