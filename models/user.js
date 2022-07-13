@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: (v) => validator.isEmail(v),
-      message: () => 'Неверный формат ссылки на изображение',
+      message: () => 'Неверный формат email',
     },
   },
   password: {
@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {

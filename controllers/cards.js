@@ -1,24 +1,28 @@
 const Card = require('../models/card');
-const { ErrCodeBadData, ErrCodeServer } = require('../costants/constants');
+const { ErrCodeBadData, OkCodeCreated } = require('../costants/constants');
 const NotFoundError = require('../errors/not-found-err');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.send(cards))
-    .catch(() => res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' }));
+    .then((cards) => res.send({ data: cards }))
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owener = req.user._id;
   Card.create({ name, link, owener })
-    .then((card) => res.send(card))
+    .then((card) => res.status(OkCodeCreated).send({
+      name: card.name,
+      link: card.about,
+      _id: card._id,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-      } else {
-        res.status(ErrCodeServer).send({ message: 'Ошибка на сервере' });
+        return;
       }
+      next(err);
     });
 };
 
@@ -49,7 +53,7 @@ module.exports.likeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
-    .then((card) => res.send(card))
+    .then((card) => res.status(OkCodeCreated).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });

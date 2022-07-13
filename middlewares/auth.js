@@ -2,17 +2,17 @@ const { checkToken } = require('../helpers/jwt');
 const UnauthorizationError = require('../errors/unauth-err');
 
 module.exports = (req, res, next) => {
-  // console.log('In auth');
+  console.log('In auth');
   const auth = req.cookies.jwt;
 
-  // console.log('auth', auth);
+  console.log('auth', auth);
 
   const token = auth.replace('Bearer ', '');
 
   if (!token) {
     throw new UnauthorizationError('Ошибка. Необходима авторизация');
   }
-  let payload = checkToken(token);
+  let payload;
   try {
     payload = checkToken(token);
   } catch (err) {

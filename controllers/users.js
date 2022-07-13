@@ -15,9 +15,8 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getMyProfile = (req, res, next) => {
-  console.log('me', req.user._id);
-  const { userId } = req.user._id;
-  User.findById(userId)
+  const { _id } = req.user;
+  User.findById(_id)
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
     .catch((err) => {
@@ -30,8 +29,7 @@ module.exports.getMyProfile = (req, res, next) => {
 };
 
 module.exports.getUserId = (req, res, next) => {
-  console.log('id', req.params.userId);
-  const { userId } = req.params.userId;
+  const { userId } = req.params;
   User.findById(userId)
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
