@@ -1,10 +1,12 @@
 const bcrypt = require('bcryptjs');
 const { generateToken } = require('../helpers/jwt');
 const User = require('../models/user');
-const { ErrCodeBadData, OkCodeCreated, ErrCodeConflictEmail } = require('../costants/constants');
+const { OkCodeCreated } = require('../costants/constants');
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizationError = require('../errors/unauth-err');
-// const ConflictEmailError = require('../errors/coflict-err');
+const BadDataError = require('../errors/bad-data-err');
+const ConflictEmailError = require('../errors/coflict-err');
+
 const MONGO_DUPLICATE_ERROR_CODE = 11000;
 const SALT_ROUNDS = 10;
 
@@ -21,8 +23,7 @@ module.exports.getMyProfile = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
+        throw new BadDataError('Ошибка. Данные не корректны');
       }
       next(err);
     });
@@ -35,8 +36,7 @@ module.exports.getUserId = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
+        throw new BadDataError('Ошибка. Данные не корректны');
       }
       next(err);
     });
@@ -48,9 +48,7 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
 
   if (!email || !password) {
-    const error = new Error('Ошибка. Данные не переданы');
-    error.statusCode = ErrCodeBadData;
-    throw error;
+    throw new BadDataError('Ошибка. Данные не переданы');
   }
 
   bcrypt
@@ -71,8 +69,7 @@ module.exports.createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.code === MONGO_DUPLICATE_ERROR_CODE) {
-        res.status(ErrCodeConflictEmail).send({ message: 'Ошибка. Пользователь с таким email уже зарегистрирован' });
-        return;
+        throw new ConflictEmailError('Ошибка. Пользователь с таким email уже зарегистрирован');
       }
       next(err);
     });
@@ -88,8 +85,7 @@ module.exports.updateUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
+        throw new BadDataError('Ошибка. Данные не корректны');
       }
       next(err);
     });
@@ -105,8 +101,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
+        throw new BadDataError('Ошибка. Данные не корректны');
       }
       next(err);
     });
@@ -116,9 +111,7 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    const error = new Error('Ошибка. Данные не переданы');
-    error.statusCode = ErrCodeBadData;
-    throw error;
+    throw new BadDataError('Ошибка. Данные не переданы');
   }
 
   return User.findUserByCredentials(email, password)
