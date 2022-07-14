@@ -19,13 +19,6 @@ module.exports = (req, res, next) => {
   let payload;
   try {
     payload = checkToken(token);
-
-    User.findById(payload._id)
-      .then((user) => {
-        if (!user) {
-          throwUnauthorizedError();
-        }
-      });
   } catch (err) {
     res.clearCookie('jwt');
     throwUnauthorizedError();
