@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const routes = require('./routes/index');
+const { ErrCodeServer } = require('./costants/constants');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -22,7 +23,7 @@ app.use(errors());
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
-  const { statusCode = 500, message } = err;
+  const { statusCode = ErrCodeServer, message } = err;
 
   res
     .status(statusCode)
