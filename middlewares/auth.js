@@ -1,17 +1,11 @@
 const { checkToken } = require('../helpers/jwt');
-const User = require('../models/user');
-
-const throwUnauthorizedError = () => {
-  const error = new Error('Авторизуйтесь для доступа');
-  error.statusCode = 401;
-  throw error;
-};
+const UnauthorizationError = require('../errors/unauth-err');
 
 module.exports = (req, res, next) => {
   const auth = req.cookies.jwt;
 
   if (!auth) {
-    throwUnauthorizedError();
+    throw new UnauthorizationError('Авторизуйтесь для доступа');
   }
 
   const token = auth.replace('Bearer ', '');
@@ -21,7 +15,7 @@ module.exports = (req, res, next) => {
     payload = checkToken(token);
   } catch (err) {
     res.clearCookie('jwt');
-    throwUnauthorizedError();
+    throw new UnauthorizationError('Авторизуйтесь для доступа');
   }
   req.user = payload;
 
