@@ -1,6 +1,8 @@
 const Card = require('../models/card');
-const { ErrCodeBadData, OkCodeCreated } = require('../costants/constants');
+const { OkCodeCreated } = require('../costants/constants');
 const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-err');
+const BadDataError = require('../errors/bad-data-err');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -20,8 +22,7 @@ module.exports.createCard = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
+        throw new BadDataError('Ошибка. Данные не корректны');
       }
       next(err);
     });
@@ -32,7 +33,7 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
     .then((card) => {
       if (card.owner.toHexString() !== req.user._id) {
-        res.status(403).send({ message: 'Ошибка. Нельзя удалить чужую карточку' });
+        throw new ForbiddenError('Ошибка. Нельзя удалить чужую карточку');
       }
       return Card.findOneAndRemove(req.params.cardId)
         .then(() => res.send(card))
@@ -40,8 +41,7 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
+        next(new BadDataError('Ошибка. Данные не корректны'));
       }
       next(err);
     });
@@ -57,8 +57,7 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.status(OkCodeCreated).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
+        throw new BadDataError('Ошибка. Данные не корректны');
       }
       next(err);
     });
@@ -74,8 +73,7 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrCodeBadData).send({ message: 'Ошибка. Данные не корректны' });
-        return;
+        throw new BadDataError('Ошибка. Данные не корректны');
       }
       next(err);
     });
