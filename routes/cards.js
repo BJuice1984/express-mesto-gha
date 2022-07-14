@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
-const { linkRegex } = require('../costants/constants');
+const {
+  validateCreateCard, validateDeleteCard, validateLikeCard, validateDislikeCard,
+} = require('../middlewares/validations');
 
 const {
   getCards, createCard, deleteCard, likeCard, dislikeCard,
@@ -8,29 +9,12 @@ const {
 
 router.get('/', getCards);
 
-router.post('/', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().regex(linkRegex),
-  }),
-}), createCard);
+router.post('/', validateCreateCard, createCard);
 
-router.delete('/:cardId', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().alphanum().hex().length(24),
-  }),
-}), deleteCard);
+router.delete('/:cardId', validateDeleteCard, deleteCard);
 
-router.put('/:cardId/likes', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
-  }),
-}), likeCard);
+router.put('/:cardId/likes', validateLikeCard, likeCard);
 
-router.delete('/:cardId/likes', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
-  }),
-}), dislikeCard);
+router.delete('/:cardId/likes', validateDislikeCard, dislikeCard);
 
 module.exports = router;

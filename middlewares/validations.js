@@ -38,3 +38,28 @@ module.exports.validateUpdateUserAvatar = celebrate({
       .regex(linkRegex),
   }),
 });
+
+module.exports.validateCreateCard = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().regex(linkRegex),
+  }),
+});
+
+module.exports.validateDeleteCard = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().hex().length(24),
+  }),
+});
+
+module.exports.validateLikeCard = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+});
+
+module.exports.validateDislikeCard = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().hex().length(24),
+  }),
+});
