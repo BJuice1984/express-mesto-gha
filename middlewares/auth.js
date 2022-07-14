@@ -10,8 +10,6 @@ const throwUnauthorizedError = () => {
 module.exports = (req, res, next) => {
   const auth = req.cookies.jwt;
 
-  console.log('auth', auth);
-
   if (!auth) {
     throwUnauthorizedError();
   }
@@ -21,11 +19,9 @@ module.exports = (req, res, next) => {
   let payload;
   try {
     payload = checkToken(token);
-    console.log('payload', payload);
 
     User.findById(payload._id)
       .then((user) => {
-        console.log('user', user);
         if (!user) {
           throwUnauthorizedError();
         }

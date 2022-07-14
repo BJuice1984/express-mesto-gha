@@ -10,12 +10,12 @@ module.exports.getCards = (req, res, next) => {
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owener = req.user._id;
-  Card.create({ name, link, owener })
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
     .then((card) => res.status(OkCodeCreated).send({
       name: card.name,
       link: card.link,
-      owener: card.owener,
+      owner: card.owner,
       _id: card._id,
     }))
     .catch((err) => {
@@ -31,7 +31,7 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
     .then((card) => {
-      if (card.owener.toHexString() !== req.user._id) {
+      if (card.owner.toHexString() !== req.user._id) {
         res.status(403).send({ message: 'Ошибка. Нельзя удалить чужую карточку' });
       }
       return Card.findOneAndRemove(req.params.cardId)

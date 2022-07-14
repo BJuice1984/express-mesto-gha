@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   },
   about: {
     type: String,
-    default: 'Исследователь океанов',
+    default: 'Исследователь',
     minlength: [2, 'Длина не менее 2-х симоволов, сейчас {VALUE}'],
     maxlength: [30, 'Длина не более 30-ти символов, сейчас {VALUE}'],
   },
@@ -35,7 +35,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: [8, 'Длина не менее 2-х симоволов, сейчас {VALUE}'],
     select: false,
   },
 });
