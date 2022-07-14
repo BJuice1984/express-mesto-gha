@@ -1,8 +1,7 @@
-const express = require('express');
+const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const { linkRegex } = require('../costants/constants');
 
-const router = express.Router();
 const {
   getCards, createCard, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');
