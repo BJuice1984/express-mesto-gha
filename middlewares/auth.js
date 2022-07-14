@@ -27,7 +27,7 @@ module.exports = (req, res, next) => {
         }
       });
   } catch (err) {
-    res.clearCookie('token');
+    res.clearCookie('jwt');
     throwUnauthorizedError();
   }
   req.user = payload;
