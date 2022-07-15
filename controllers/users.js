@@ -23,7 +23,8 @@ module.exports.getMyProfile = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadDataError('Ошибка. Данные не корректны');
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
       }
       next(err);
     });
@@ -36,7 +37,8 @@ module.exports.getUserId = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadDataError('Ошибка. Данные не корректны');
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
       }
       next(err);
     });
@@ -85,7 +87,8 @@ module.exports.updateUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadDataError('Ошибка. Данные не корректны');
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
       }
       next(err);
     });
@@ -101,7 +104,8 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadDataError('Ошибка. Данные не корректны');
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
       }
       next(err);
     });

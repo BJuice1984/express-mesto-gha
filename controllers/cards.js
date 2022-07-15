@@ -22,7 +22,8 @@ module.exports.createCard = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadDataError('Ошибка. Данные не корректны');
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
       }
       next(err);
     });
@@ -57,7 +58,8 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.status(OkCodeCreated).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadDataError('Ошибка. Данные не корректны');
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
       }
       next(err);
     });
@@ -73,7 +75,8 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadDataError('Ошибка. Данные не корректны');
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
       }
       next(err);
     });
