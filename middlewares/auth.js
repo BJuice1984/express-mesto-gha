@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
     throw new UnauthorizationError('Авторизуйтесь для доступа');
   }
 
-  const token = auth.replace('Bearer ', '');
+  const token = auth;
 
   let payload;
   try {

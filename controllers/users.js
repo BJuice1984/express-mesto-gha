@@ -72,6 +72,7 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.code === MONGO_DUPLICATE_ERROR_CODE) {
         next(new ConflictEmailError('Ошибка. Пользователь с таким email уже зарегистрирован'));
+        return;
       }
       next(err);
     });
