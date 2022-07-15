@@ -21,13 +21,7 @@ module.exports.getMyProfile = (req, res, next) => {
   User.findById(_id)
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadDataError('Ошибка. Данные не корректны'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.getUserId = (req, res, next) => {
@@ -35,13 +29,7 @@ module.exports.getUserId = (req, res, next) => {
   User.findById(userId)
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadDataError('Ошибка. Данные не корректны'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -86,13 +74,7 @@ module.exports.updateUser = (req, res, next) => {
   })
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new BadDataError('Ошибка. Данные не корректны'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -103,13 +85,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
   })
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new BadDataError('Ошибка. Данные не корректны'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.login = (req, res, next) => {
