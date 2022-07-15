@@ -1,5 +1,5 @@
 [![Tests](https://github.com/BJuice1984/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/BJuice1984/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
-# Проект Mesto фронтенд + бэкенд
+# Проект Mesto бэкенд
 
 
 
