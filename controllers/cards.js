@@ -2,7 +2,6 @@ const Card = require('../models/card');
 const { OkCodeCreated } = require('../costants/constants');
 const NotFoundError = require('../errors/not-found-err');
 const ForbiddenError = require('../errors/forbidden-err');
-const BadDataError = require('../errors/bad-data-err');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -20,13 +19,7 @@ module.exports.createCard = (req, res, next) => {
       owner: card.owner,
       _id: card._id,
     }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadDataError('Ошибка. Данные не корректны'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -39,13 +32,7 @@ module.exports.deleteCard = (req, res, next) => {
       return card.remove()
         .then(() => res.send({ message: 'Карточка удалена' }));
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadDataError('Ошибка. Данные не корректны'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -56,13 +43,7 @@ module.exports.likeCard = (req, res, next) => {
   )
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
     .then((card) => res.status(OkCodeCreated).send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadDataError('Ошибка. Данные не корректны'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -73,11 +54,5 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
     .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadDataError('Ошибка. Данные не корректны'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
