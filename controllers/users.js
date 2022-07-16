@@ -62,6 +62,10 @@ module.exports.createUser = (req, res, next) => {
         next(new ConflictEmailError('Ошибка. Пользователь с таким email уже зарегистрирован'));
         return;
       }
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
+      }
       next(err);
     });
 };
@@ -74,7 +78,13 @@ module.exports.updateUser = (req, res, next) => {
   })
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
+      }
+      next(err);
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -85,7 +95,13 @@ module.exports.updateUserAvatar = (req, res, next) => {
   })
     .orFail(() => { throw new NotFoundError('Ошибка. Пользователь не найден'); })
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
+      }
+      next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {

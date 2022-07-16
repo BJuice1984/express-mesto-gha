@@ -2,6 +2,7 @@ const Card = require('../models/card');
 const { OkCodeCreated } = require('../costants/constants');
 const NotFoundError = require('../errors/not-found-err');
 const ForbiddenError = require('../errors/forbidden-err');
+const BadDataError = require('../errors/bad-data-err');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -19,7 +20,13 @@ module.exports.createCard = (req, res, next) => {
       owner: card.owner,
       _id: card._id,
     }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
+      }
+      next(err);
+    });
 };
 
 module.exports.deleteCard = (req, res, next) => {
