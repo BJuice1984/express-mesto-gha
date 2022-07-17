@@ -21,7 +21,7 @@ module.exports.createCard = (req, res, next) => {
       _id: card._id,
     }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadDataError('Ошибка. Данные не корректны'));
         return;
       }
@@ -39,7 +39,13 @@ module.exports.deleteCard = (req, res, next) => {
       return card.remove()
         .then(() => res.send({ message: 'Карточка удалена' }));
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
+      }
+      next(err);
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -50,7 +56,13 @@ module.exports.likeCard = (req, res, next) => {
   )
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
     .then((card) => res.status(OkCodeCreated).send(card))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
+      }
+      next(err);
+    });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -61,5 +73,11 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .orFail(() => { throw new NotFoundError('Ошибка. Карточка не найдена'); })
     .then((card) => res.send(card))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadDataError('Ошибка. Данные не корректны'));
+        return;
+      }
+      next(err);
+    });
 };
