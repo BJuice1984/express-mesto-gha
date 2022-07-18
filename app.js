@@ -6,7 +6,6 @@ const { errors } = require('celebrate');
 const routes = require('./routes/index');
 const { ErrCodeServer } = require('./costants/constants');
 
-// Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -29,7 +28,7 @@ app.use((err, req, res, next) => {
     .status(statusCode)
     .send({
       // проверяем статус и выставляем сообщение в зависимости от него
-      message: statusCode === 500
+      message: statusCode === ErrCodeServer
         ? 'На сервере произошла ошибка'
         : message,
     });
